@@ -35,8 +35,8 @@ Terminal alternative (any Icarus Verilog):
 | Latency per inference | 2443 clocks | measured in simulation |
 | Latency in time | 24.4 us ONLY IF timing closes at the app's 100 MHz default clock (STA has not run) | estimate |
 | Throughput | ~41,000 inferences/s | conditional on the same 100 MHz closure; not measured silicon performance |
-| Sim wall-clock, all 20 images | ~0.9 s | Linux sandbox, Icarus vvp |
-| Size after synthesis | ~10.6k cells (generic Yosys logical map) | yosys synth; area/routability unverified until the physical flow runs |
+| Sim wall-clock, all 20 images | ~1.3 s inside the app's own run path | Tickwave app integration run, Linux |
+| Generic synthesis (Gates pane) | 6,652 cells / ~11.7k gate-equivalents / logic depth 74, ~12 s | Tickwave app integration run, Linux WASM Yosys; area/routability unverified until the physical flow runs |
 
 Gates/area/power/timing on sky130 come from the app's own chip-flow run
 (`runs/tw/final/metrics.json`) - no precomputed layout ships in this repo.
@@ -68,16 +68,22 @@ Gates/area/power/timing on sky130 come from the app's own chip-flow run
                     ReLU, >>11                  scores[10]
 ```
 
-- `rtl/synapse1.v` - top: control FSM, pixel buffer, hidden activations, scores
-- `rtl/mac.v` - the one shared signed multiplier
-- `rtl/weights_rom.v` - GENERATED: trained weights as synthesizable ROMs
-- `tb/tb_synapse1.v` - self-checking driver (embeds the 20 verified images,
+All Verilog sits flat at the repository root (the app's Gates/flow engine
+works on root-level sources):
+
+- `synapse1.v` - top: control FSM, pixel buffer, hidden activations, scores
+- `mac.v` - the one shared signed multiplier
+- `weights_rom.v` - GENERATED: trained weights as synthesizable ROMs
+- `tb_synapse1.v` - self-checking driver (embeds the 20 verified images,
   prints PASS/FAIL, exits with `$finish`)
-- `data/` - the same demo images + labels as hex, plus the training report
+- `TRAINING.md` - generated training/verification report
 - `train/train.py` - regenerates everything: trains, quantizes, verifies the
   exact integer arithmetic the hardware uses, rewrites weights_rom.v and the
-  testbench data block (`python3 train/train.py`, needs numpy)
-- `chip/config.json` - manual LibreLane config (the app's chip flow generates
-  its own; this is for command-line reproduction)
+  testbench data block (`python3 train/train.py`, needs numpy). Raw hex copies
+  of the images/labels are written to `data/` as local artifacts (gitignored;
+  the demo does not read them - the testbench is self-contained)
+- `config.json` + `design.sdc` - manual LibreLane config for command-line
+  reproduction (the app's chip flow generates its own; these files are not
+  app project files)
 
 Private demo repository - all rights reserved.
