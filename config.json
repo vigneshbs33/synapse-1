@@ -1,9 +1,14 @@
 {
   "DESIGN_NAME": "synapse1",
-  "VERILOG_FILES": ["synapse1.v", "mac.v", "weights_rom.v"],
+  "VERILOG_FILES": "dir::src/*.v",
   "CLOCK_PORT": "clk",
   "CLOCK_PERIOD": 10,
   "PDK": "sky130A",
   "STD_CELL_LIBRARY": "sky130_fd_sc_hd",
-  "FP_CORE_UTIL": 45
+  "PL_TARGET_DENSITY_PCT": 50,
+  "PNR_SDC_FILE": "dir::design.sdc",
+  "SIGNOFF_SDC_FILE": "dir::design.sdc",
+  "FP_SIZING": "relative",
+  "FP_CORE_UTIL": 45,
+  "FP_ASPECT_RATIO": 1
 }
