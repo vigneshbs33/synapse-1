@@ -1,6 +1,6 @@
 # Synapse-1
 
-A neural network frozen into silicon - designed and simulated in
+A neural network frozen into hardware (RTL) - designed and simulated in
 [Tickwave](https://tickwaveeda.vercel.app), and taken all the way to a real
 sky130 layout with the same open silicon flow the app drives.
 
@@ -22,7 +22,7 @@ the digit.
 4. Open the **Gates** pane to see the synthesized netlist, then run the
    **chip flow** (where the chip backend is installed) to place and route it
    to a sky130 layout. A precomputed GDS from a Linux run of this exact
-   design (see "Silicon run" below) also exists as a private build artifact
+   design (see "Physical layout run" below) also exists as a private build artifact
    and can be opened in the Layout view if the backend is not installed.
 
 Terminal alternative (any Icarus Verilog):
@@ -41,7 +41,7 @@ Terminal alternative (any Icarus Verilog):
 | Sim wall-clock, all 20 images | ~1.3 s inside the app's own run path | Tickwave app integration run, Linux |
 | Generic synthesis (Gates pane) | 6,652 cells / ~11.7k gate-equivalents / logic depth 74, ~12 s | Tickwave app integration run, Linux WASM Yosys; area/routability unverified until the physical flow runs |
 
-## Silicon run (actual, precomputed on Linux)
+## Physical layout run (actual, precomputed on Linux)
 
 A full RTL-to-GDS flow of this exact tree was run with LibreLane 3.0.16 +
 sky130A (sky130_fd_sc_hd), using the app's generated config and SDC
@@ -64,7 +64,7 @@ the app UI.
 | Setup @ 100 MHz, slow/hot (ss 100C 1.6V) | FAIL: -8.153 ns worst slack (max view; -7.794 ns in the nominal view), 1,272 setup violations counted across the three ss STA views (429 max / 428 nom / 415 min; a sum of per-view counts, not unique endpoints), plus 806 slew and 72 max-cap violations at the max ss view |
 
 What this means, honestly: the layout is real - DRC/LVS/antenna
-clean and meets its 100 MHz target on typical and fast silicon. It is NOT
+clean, and post-layout static timing meets the 10 ns constraint in the reported typical/fast STA views (not measured silicon). It is NOT
 closed across all corners and NOT fab-ready; the slow/hot corner would need
 deeper pipelining or a relaxed clock. For the demo, the typical-corner
 numbers stand and the slow-corner miss is on the table. (Overall worst
@@ -85,7 +85,7 @@ Manual reproduction (same commands the app flow used):
   multiply-accumulate), one stage per clock, targeting the app's 100 MHz
   default. Real signoff STA (below) shows 100 MHz closes at typical and
   fast corners and FAILS at the slow/hot corner - so microseconds and
-  throughput hold for typical silicon, not worst-case silicon.
+  throughput hold in the typical/fast STA views, not the slow/hot view; none of this is measured silicon.
 - Everything here is free/open tooling: Icarus Verilog, Yosys, LibreLane,
   sky130A.
 
